@@ -1,7 +1,7 @@
-#include <string.h>
+﻿#include <string.h>
 #include <stdio.h>
 #include "udp.h"
-
+#include "math.h"
 
 myudp::myudp()
 {
@@ -40,8 +40,8 @@ int myudp::socket_send(const char *IP,const char *buf, int len)
     st = socket(AF_INET , SOCK_DGRAM, 0);//建立一个socket
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));//初始化结构addr
-    addr.sin_family = AF_INET;//代表使用一个TCP/IP协议
-    addr.sin_port = htons(8080);
+ //   addr.sin_family = AF_INET;//代表使用一个TCP/IP协议
+ //   addr.sin_port = htons(8080);
     addr.sin_addr.s_addr = inet_addr(IP);
 
 
@@ -52,6 +52,19 @@ int myudp::socket_send(const char *IP,const char *buf, int len)
 
 
     return rc;
+}
+
+int myudp::socket_bind(short int port)
+{
+
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));//初始化结构addr
+    addr.sin_family = AF_INET;//代表使用一个TCP/IP协议
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);//作为接收方不需要指定具体的ip地址
+    int rc=0;
+    return bind(st,(struct sockaddr *)&addr, sizeof(addr));//绑定端口
+
 }
 
 int myudp::socket_recv(char *buf, int len,char *srcIP)
@@ -80,15 +93,4 @@ int myudp::socket_recv(char *buf, int len,char *srcIP)
 
 }
 
-int myudp::socket_bind(short int port)
-{
 
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));//初始化结构addr
-    addr.sin_family = AF_INET;//代表使用一个TCP/IP协议
-    addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);//作为接收方不需要指定具体的ip地址
-    int rc=0;
-    return bind(st,(struct sockaddr *)&addr, sizeof(addr));//绑定端口
-
-}
